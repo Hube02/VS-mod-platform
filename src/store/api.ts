@@ -2,6 +2,7 @@ import axios from "axios";
 import {Mod, PAGE_SIZE} from "../types/types";
 
 export function mockFetchMods(page: number): Promise<{ items: Mod[]; total: number }> {
+    getAllMods();
     return new Promise((resolve) => {
         setTimeout(() => {
             const all: Mod[] = Array.from({ length: 42 }).map((_, i) => ({
@@ -17,4 +18,13 @@ export function mockFetchMods(page: number): Promise<{ items: Mod[]; total: numb
             });
         }, 400);
     });
+}
+
+export function getAllMods() {
+    return fetch("https://mods.vintagestory.at/api/mods").then(res => res.json()).then(data => {
+        console.log(data);
+        return data;
+    }).catch (err => {
+        console.error("Couldn't fetch mods!");
+    })
 }
