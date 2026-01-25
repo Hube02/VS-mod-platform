@@ -1,27 +1,23 @@
-import { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Box,
     Button,
-    Card,
-    CardActions,
-    CardContent,
+    CircularProgress,
     Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Grid,
     Pagination,
     Stack,
-    TextField,
+    Switch,
     Typography,
 } from "@mui/material";
-import { motion } from "framer-motion";
 import {Mod, Modpack, PAGE_SIZE} from "../types/types";
-import {loadModpacks, saveModpacks} from "../store/storage";
-import {mockFetchMods} from "../store/api";
+import {checkAllModsAndFetch, loadModpacks, saveModpacks} from "../store/storage";
+import {getAllMods, grabMods} from "../store/api";
+import ModToModpackDialog from "../components/AddModToModpackDialog";
+import ModGrid from "../components/ModGrid";
+import ModSearch from "../components/ModSearch";
+import CurrentModpack from "../components/CurrentModpack";
+import SelectCurrentModpack from "../components/SelectCurrentModpack";
 
-const MotionCard = motion(Card);
 
 export default function ModList() {
     const [page, setPage] = useState(1);
@@ -29,126 +25,131 @@ export default function ModList() {
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    const [modpacks, setModpacks] = useState<Modpack[]>([]);
+    const [isAdding, setIsAdding] = useState<boolean>(false)
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedMod, setSelectedMod] = useState<Mod | null>(null);
-    const [newPackName, setNewPackName] = useState("");
+
+    const [searchQuery, setSearchQuery] = useState<string>('')
+    const [isDescriptionSearch, setIsDescriptionSearch] = useState<boolean>(false)
+
+    const [modpacks, setModpacks] = useState<Modpack[]>([]);
+    const [currentModpack, setCurrentModpack] = useState<Modpack | undefined>();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     useEffect(() => {
-        setModpacks(loadModpacks());
+        const loadedModpacks = loadModpacks();
+        console.log(loadedModpacks)
+        if (loadedModpacks.length > 0) {
+            setModpacks(loadedModpacks);
+            setCurrentModpack(loadedModpacks[0])
+        }
+        if (checkAllModsAndFetch().length == 0) {
+            handleRefresh()
+        }
     }, []);
+    useEffect(() => {
+        if (modpacks.length > 0) {
+            saveModpacks(modpacks)
+        }
+    }, [modpacks]);
+
+    const handleModpackSave = (modpack: Modpack) => {
+        setModpacks(prevState => {
+            return [...prevState.filter(pack => pack.name != modpack.name), modpack]
+        })
+        setCurrentModpack(modpack)
+    }
 
     useEffect(() => {
-        mockFetchMods(page).then((res) => {
+        fetchMods(page, searchQuery, isDescriptionSearch)
+    }, [page, searchQuery, isDescriptionSearch]);
+
+    function fetchMods(currentPage: number, searchPhrase: string, isDesciption: boolean) {
+        grabMods(currentPage, searchPhrase, isDesciption).then((res) => {
             setLoading(true);
             setMods(res.items);
-            setTotal(200);
+            setTotal(res.total);
             setLoading(false);
         })
-    }, [page]);
+    }
 
-    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const handleRefresh = () => {
+        setLoading(true)
+        getAllMods().then(_ => {
+            fetchMods(page, searchQuery, isDescriptionSearch)
+            setLoading(false)
+        })
+    }
 
-    function addToPack(packName: string) {
-        if (!selectedMod) return;
-
-        const updated = [...modpacks];
-        const idx = updated.findIndex((p) => p.name === packName);
-
-        if (idx >= 0) {
-            updated[idx].mods.push(selectedMod);
-        } else {
-            updated.push({ name: packName, mods: [selectedMod] });
-        }
-
-        setModpacks(updated);
-        saveModpacks(updated);
-        setDialogOpen(false);
-        setNewPackName("");
+    function handleSearch(event: any) {
+        setSearchQuery(event.target.value)
+        setPage(1)
     }
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant="h4" fontWeight={700} gutterBottom>
-                Mod Browser
-            </Typography>
+        <>
+            <SelectCurrentModpack
+                currentModpack={currentModpack}
+                setCurrentModpack={setCurrentModpack}
+                allModpacks={modpacks && modpacks}/>
+            <CurrentModpack
+                currentModpack={currentModpack}
+                setCurrentModpack={handleModpackSave}
+                isOpen={isSidebarOpen}
+                setIsOpen={setIsSidebarOpen}/>
+            <Container sx={{width: '80%', maxWidth: '80%', py: 4, mx: '20%'}}>
+                <Box component='div'
+                     sx={{px: '10%', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <Typography variant="h4" fontWeight={700} gutterBottom>
+                        Mod Browser
+                    </Typography>
+                    <Button onClick={() => handleRefresh()}>Refresh mods</Button>
+                </Box>
+                <ModSearch onChange={handleSearch}>
+                    <Typography variant={'body2'}>
+                        Name search
+                    </Typography>
+                    <Switch checked={isDescriptionSearch}
+                            onClick={(event: any) => setIsDescriptionSearch(event.target.checked)}/>
+                    <Typography variant={'body2'}>
+                        Description search
+                    </Typography>
+                </ModSearch>
+                {loading ?
+                    <CircularProgress/> :
+                    <ModGrid
+                        data={mods}
+                        onChange={(mod: Mod, isAdding: boolean) => {
+                            setSelectedMod(mod)
+                            setIsAdding(isAdding)
+                            setDialogOpen(true)
+                        }}
+                    />
+                }
 
-            <Grid container spacing={3}>
-                {mods.map((mod) => (
-                    <Grid sx={{xs: 12, sm: 6, md: 3}} key={mod.id}>
-                        <MotionCard whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 260 }}>
-                            <CardContent>
-                                <Typography variant="h6">{mod.name}</Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                    {mod.description}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button
-                                    size="small"
-                                    fullWidth
-                                    onClick={() => {
-                                        setSelectedMod(mod);
-                                        setDialogOpen(true);
-                                    }}
-                                >
-                                    Add to Modpack
-                                </Button>
-                            </CardActions>
-                        </MotionCard>
-                    </Grid>
-                ))}
-            </Grid>
+                {loading && (
+                    <Typography variant="body2" sx={{mt: 2}}>
+                        Loading...
+                    </Typography>
+                )}
 
-            {loading && (
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                    Loading...
-                </Typography>
-            )}
-
-            <Stack alignItems="center" sx={{ mt: 4 }}>
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={(_, value) => setPage(value)}
-                    color="primary"
-                />
-            </Stack>
-
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth>
-                <DialogTitle>Add to Modpack</DialogTitle>
-                <DialogContent>
-                    <Stack spacing={2} sx={{ mt: 1 }}>
-                        {modpacks.map((pack) => (
-                            <Button
-                                key={pack.name}
-                                variant="outlined"
-                                onClick={() => addToPack(pack.name)}
-                            >
-                                {pack.name} ({pack.mods.length} mods)
-                            </Button>
-                        ))}
-
-                        <Box pt={2}>
-                            <TextField
-                                fullWidth
-                                label="New modpack name"
-                                value={newPackName}
-                                onChange={(e) => setNewPackName(e.target.value)}
-                            />
-                        </Box>
-                    </Stack>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-                    <Button
-                        disabled={!newPackName}
-                        onClick={() => addToPack(newPackName)}
-                    >
-                        Create & Add
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Container>
+                <Stack alignItems="center" sx={{mt: 4}}>
+                    <Pagination
+                        count={Math.ceil(total / PAGE_SIZE)}
+                        page={page}
+                        onChange={(_, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Stack>
+            </Container>
+            <ModToModpackDialog isOpen={dialogOpen}
+                                isAdding={isAdding}
+                                selectedMod={selectedMod}
+                                onClose={() => setDialogOpen(false)}
+                                allModpacks={modpacks}
+                                setCurrentModpack={handleModpackSave}
+                                currentModpack={currentModpack}
+            />
+        </>
     );
 }
