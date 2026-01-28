@@ -28,16 +28,18 @@ export default function NewModpackInput() {
     }
 
     return (
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <Input
-                sx={{width: '75%'}}
-                value={currentString}
-                onChange={(e) => setCurrentString(e.target.value)}
-            />
-            <Button onClick={handleImport}>
-                <ClipboardPaste/>
-            </Button>
+        <>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <Input
+                    sx={{width: '75%'}}
+                    value={currentString}
+                    onChange={(e) => setCurrentString(e.target.value)}
+                />
+                <Button onClick={handleImport}>
+                    <ClipboardPaste/>
+                </Button>
+            </div>
             <Typography variant={'body2'}>{error}</Typography>
-        </div>
+        </>
     )
 }

@@ -2,9 +2,9 @@
 import {Paper, Link, List, ListItem, Typography, Button, Tooltip} from "@mui/material";
 import React from "react";
 import Scrollbar from "react-scrollbars-custom";
-import {ArrowLeft, RemoveCircleOutline, Input, FileDownloadDone, Download} from "@mui/icons-material";
+import {RemoveCircleOutline, Input, FileDownloadDone, Download} from "@mui/icons-material";
 import {motion} from "framer-motion";
-import {useAppDispatch, useAppSelector, useWindowSize} from "../../utils/hooks";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
 import {getCurrentModpack, getMods} from "../../store/selectors";
 import {removeModpack, setCurrentModpack, updateModWithDetails} from "../../store/reducer";
 import {Mod} from "../../types/types";
@@ -12,17 +12,14 @@ import {fetchModDetailsByModId} from "../../store/api";
 import {downloadZipFromModList} from "../../utils/dataShaper";
 
 const MotionPaper = motion.create(Paper)
-const MotionArrow = motion.create(ArrowLeft)
 
-export default function CurrentModpack({isOpen, setIsOpen}: {
+export default function CurrentModpack({isOpen}: {
     isOpen: boolean,
-    setIsOpen: (isOpen: boolean) => void
 }) {
 
     const currentModpack = useAppSelector(getCurrentModpack)
     const mods = useAppSelector(getMods)
     const dispatch = useAppDispatch()
-    const {isMobile, isTablet} = useWindowSize()
 
     const handleRemoveMod = (mod: Mod) => {
         dispatch(setCurrentModpack({
@@ -99,39 +96,10 @@ export default function CurrentModpack({isOpen, setIsOpen}: {
 
     return (
         <>
-            <div style={isMobile ? {
+            <div style={{
                 float: 'left',
                 marginLeft: '16px',
-                width: '30vw',
-                textAlign: 'left',
-                top: '25%',
-                position: 'fixed',
-            } : isTablet ? {
-                float: 'left',
-                marginLeft: '16px',
-                width: '25vw',
-                textAlign: 'left',
-                top: '25%',
-                position: 'fixed',
-            } : {
-                float: 'left',
-                marginLeft: '16px',
-                width: '15vw',
-                textAlign: 'left',
-                top: '25%',
-                position: 'fixed',
-            }}>
-                <Button disableRipple style={{minWidth: '32px'}} sx={{display: 'block', width: '32px', height: '32px'}}
-                        variant={'contained'} onClick={() => setIsOpen(!isOpen)}>
-                    <MotionArrow animate={isOpen ? {
-                        x: -12,
-                        transition: {duration: 0.2}
-                    } : {
-                        x: -12,
-                        rotate: 180,
-                        transition: {duration: 0.2}
-                    }}/>
-                </Button>
+                width: '100%',}}>
                 <MotionPaper
                     sx={{
                         display: 'block',
@@ -154,21 +122,24 @@ export default function CurrentModpack({isOpen, setIsOpen}: {
                         <Typography variant={'h6'}>
                             {currentModpack?.name || 'No modpack created yet!'}
                         </Typography>
-                        {currentModpack && (<>
-                            <Button
-                                onClick={handleDownload}
-                                style={{minWidth:'16px'}}
-                            >
-                                <Download/>
-                            </Button>
-                            <Button
-                                onClick={handleRemoveModpack}
-                                style={{minWidth:'16px'}}
-                            >
-                                <RemoveCircleOutline/>
-                            </Button>
-                        </>)
-                    }
+                        <span>
+                            {currentModpack && (
+                                <>
+                                    <Button
+                                        onClick={handleDownload}
+                                        style={{minWidth:'16px'}}
+                                    >
+                                        <Download/>
+                                    </Button>
+                                    <Button
+                                        onClick={handleRemoveModpack}
+                                        style={{minWidth:'16px'}}
+                                    >
+                                        <RemoveCircleOutline/>
+                                    </Button>
+                                </>
+                            )}
+                        </span>
                     </div>
                     <List sx={{width: '100%'}}>
                         <Scrollbar trackXProps={{style: {display: 'none'}}}

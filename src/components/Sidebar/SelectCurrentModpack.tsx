@@ -6,9 +6,11 @@ import NewModpackInput from "./NewModpackInput";
 import {useAppDispatch, useAppSelector} from "../../utils/hooks";
 import {getCurrentModpack, getModpacks} from "../../store/selectors";
 import {setCurrentModpack} from "../../store/reducer";
+import {motion} from "framer-motion";
 
+const MotionPaper = motion.create(Paper)
 
-export default function SelectCurrentModpack() {
+export default function SelectCurrentModpack({isOpen}: {isOpen: boolean}) {
     const [newModpack, setNewModpack] = useState('')
 
     const currentModpack = useAppSelector(getCurrentModpack)
@@ -33,17 +35,26 @@ export default function SelectCurrentModpack() {
         <>
             <div style={{
                 float: 'left',
-                marginLeft: '16px',
-                width: '15vw',
-                textAlign: 'left',
-                top: '10%',
-                position: 'fixed',
+                margin: '0px 0px 16px 16px',
+                width: '100%'
             }}>
-                <Paper
+                <MotionPaper
                     sx={{
                         display: 'block',
                         boxSizing: 'border-box',
-                        p: 2
+                        p: 2,
+                        width: '100%'
+                    }}
+                    animate={isOpen ? {
+                        scaleX: 1,
+                        opacity: 1,
+                        x:0,
+                        transition: {duration: 0.2}
+                    } : {
+                        scaleX: 0,
+                        opacity: 0,
+                        x:'-100%',
+                        transition: {duration: 0.2}
                     }}
                 >
                     <div style={{display: 'flex', justifyContent: 'space-between'}}>
@@ -68,7 +79,7 @@ export default function SelectCurrentModpack() {
                         </Button>}
                     </div>
                     <NewModpackInput/>
-                </Paper>
+                </MotionPaper>
             </div>
         </>
     )
