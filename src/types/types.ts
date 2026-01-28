@@ -10,12 +10,24 @@ export interface Mod {
     type: string,
     logo: string,
     tags: Tag[],
-    lastreleased: string
+    lastreleased: string,
+    releases: Release[]
+
+}
+export interface Release {
+    fileid: number
+    mainfile: string
+    filename: string
+    tags: string[]
 }
 
 export interface Modpack {
     name: string;
     mods: Mod[];
+}
+
+export interface ModpackDTO {
+    [key: string]: Pick<Mod, 'modid'|'lastreleased'>[]
 }
 
 export type Tag = string

@@ -1,17 +1,26 @@
 import {Button, CardActions, CardContent, Card, Grid, Typography, Tooltip} from "@mui/material";
 import {motion} from "framer-motion";
-import {Mod} from "../types/types";
+import {Mod} from "../../types/types";
 import Scrollbar from "react-scrollbars-custom";
-import {useMobileSize, useTabletSize} from "../utils/useWindowSize";
+import {useAppDispatch, useAppSelector, useWindowSize} from "../../utils/hooks";
+import {getCurrentMods} from "../../store/selectors";
+import {setSelectedMod} from "../../store/reducer";
 
 
 const MotionCard = motion.create(Card);
 
-export default function ModGrid({data, onChange}: { data: Mod[], onChange: (mod: Mod, isAdding: boolean) => void }) {
-    const isMobile = useMobileSize()
-    const isTablet = useTabletSize()
+export default function ModGrid({onChange}: { onChange: (isAdding: boolean) => void}) {
+    const data = useAppSelector(getCurrentMods)
+    const dispatch = useAppDispatch()
+    const {isMobile, isTablet} = useWindowSize()
+
+    const handleChange = (mod: Mod, isAdding: boolean) => {
+        dispatch(setSelectedMod(mod))
+        onChange(isAdding)
+    }
+
     return (
-        <Grid container columns={3} spacing={2}>
+        <Grid container columns={isMobile ? 1 : isTablet ? 2 : 3} spacing={isMobile || isTablet ? 1 : 2}>
             {data.map((mod) => (
                 <Grid sx={isMobile ? {width: '100%'} : isTablet ? {width: '45%'} : {width: '30%'}} key={mod.modid}>
                     <MotionCard sx={{display: 'flex', height: '15vh'}} whileHover={{scale: 1.03}}
@@ -39,14 +48,14 @@ export default function ModGrid({data, onChange}: { data: Mod[], onChange: (mod:
                         }}>
                             <Button
                                 size="small"
-                                onClick={() => onChange(mod, true)}
+                                onClick={() => handleChange(mod, true)}
                             >
                                 +
                             </Button>
                             <Button
                                 style={{margin: 0}}
                                 size="small"
-                                onClick={() => onChange(mod, false)}
+                                onClick={() => handleChange(mod, false)}
                             >
                                 -
                             </Button>

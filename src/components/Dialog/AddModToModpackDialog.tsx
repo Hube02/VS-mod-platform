@@ -7,60 +7,67 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import {Mod, Modpack} from "../types/types";
+import {useAppDispatch, useAppSelector} from "../../utils/hooks";
+import {getModpacks, getSelectedMod} from "../../store/selectors";
+import {setCurrentModpack} from "../../store/reducer";
+import {Modpack} from "../../types/types";
 
 interface ModToModpackDialogProps {
     isOpen: boolean
     onClose: () => void
-    selectedMod: Mod|null
     isAdding: boolean
-    allModpacks: Modpack[]
-    setCurrentModpack: (modpacks: Modpack) => void
-    currentModpack?: Modpack
 }
 
-export default function ModToModpackDialog({isOpen, onClose, selectedMod, isAdding, currentModpack, allModpacks, setCurrentModpack}: ModToModpackDialogProps) {
+export default function ModToModpackDialog({isOpen, onClose, isAdding}: ModToModpackDialogProps) {
     const [newPackName, setNewPackName] = useState("");
     const [error, setError] = useState("");
-    const modpack = currentModpack;
+
+    const dispatch = useAppDispatch()
+
+    const allModpacks = useAppSelector(getModpacks)
+    const selectedMod = useAppSelector(getSelectedMod)
 
     useEffect(() => {
         setError('')
+        setNewPackName('')
     }, [isOpen]);
 
     const handleChange = (modpackName: string) => {
+        if (!selectedMod) return;
+        if (!allModpacks) return;
+        const pack = allModpacks.find(pack => pack.name == modpackName)
         if (isAdding) {
-            addToPack(modpackName)
+            if (modpackName == newPackName) {
+                dispatch(setCurrentModpack({name: modpackName, mods: [selectedMod]}))
+                onClose();
+                return;
+            }
+            addToPack(pack)
         } else {
-            removeFromPack()
+            removeFromPack(pack)
         }
     }
 
-    function addToPack(modpackName: string) {
-        if (!selectedMod) return;
-        if (modpackName == newPackName) {
-            setCurrentModpack({name: modpackName, mods: [selectedMod]})
-            onClose();
+    function addToPack(pack?: Modpack) {
+        if (!pack) {
+            setError('No modpack entered!')
             return;
         }
-        if (!modpack) {
-            setError('No modpack name entered!')
-            return;
-        }
-        setCurrentModpack(modpack)
-        if (modpack.mods.find(mod => mod.modid == selectedMod.modid)) {
+        if (pack?.mods.find(mod => mod.modid == selectedMod?.modid)) {
             setError("This mod is already added to selected modpack");
             return;
         }
-        modpack.mods.push(selectedMod);
-
+        const modpack = {name: pack?.name, mods: [...pack?.mods!, selectedMod]}
+        dispatch(setCurrentModpack(modpack))
         onClose();
     }
 
-    function removeFromPack() {
-        if (!selectedMod) return;
-        if (!modpack) return;
-        setCurrentModpack({name: modpack.name, mods: modpack.mods.filter(mod => mod.modid != selectedMod.modid)})
+    function removeFromPack(pack?: Modpack) {
+        if (!pack) {
+            setError('No modpack entered!')
+            return;
+        }
+        dispatch(setCurrentModpack({name: pack?.name, mods: pack?.mods.filter(mod => mod.modid != selectedMod?.modid)}))
         onClose();
     }
 
@@ -69,7 +76,7 @@ export default function ModToModpackDialog({isOpen, onClose, selectedMod, isAddi
             <DialogTitle>{isAdding ? 'Add to modpack' : 'Remove from modpack'}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} sx={{ mt: 1 }}>
-                    {allModpacks.map((pack) => (
+                    {allModpacks && allModpacks.map((pack) => (
                         <Button
                             key={pack.name}
                             variant="outlined"
