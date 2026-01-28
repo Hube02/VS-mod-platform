@@ -4,8 +4,10 @@ export const theme = createTheme({
     palette: {
         mode: "dark",
         primary: {
-            main: "#7c3aed",
+            main: "#CC9966",
         },
+        background: {
+        }
     },
     shape: {
         borderRadius: 12,

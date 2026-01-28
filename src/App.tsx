@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.css';
-import ModList from "./containers/modList";
+import ModBrowser from "./containers/ModBrowser";
 
 function App() {
   return (
     <div className="App">
-        <ModList/>
+        <ModBrowser/>
     </div>
   );
 }

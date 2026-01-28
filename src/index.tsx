@@ -9,6 +9,8 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import { theme } from "./theme";
 import { ThemeProvider, CssBaseline } from "@mui/material";
+import {Provider} from "react-redux";
+import {store} from "./store/store";
 
 
 const root = ReactDOM.createRoot(
@@ -16,10 +18,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
     <React.StrictMode>
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <App />
-        </ThemeProvider>
+        <Provider store={store}>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <App />
+            </ThemeProvider>
+        </Provider>
     </React.StrictMode>
 );
 
