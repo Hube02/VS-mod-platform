@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/VS-mod-platform/static/css/main.25a3498c.css",
-    "main.js": "/VS-mod-platform/static/js/main.14a05a81.js",
-    "static/js/453.a04ae9d0.chunk.js": "/VS-mod-platform/static/js/453.a04ae9d0.chunk.js",
+    "main.js": "/VS-mod-platform/static/js/main.11f81ceb.js",
+    "static/js/453.5505c19b.chunk.js": "/VS-mod-platform/static/js/453.5505c19b.chunk.js",
     "static/media/roboto-latin-700-normal.woff2": "/VS-mod-platform/static/media/roboto-latin-700-normal.3d32572dd5951c418e5b.woff2",
     "static/media/roboto-latin-500-normal.woff2": "/VS-mod-platform/static/media/roboto-latin-500-normal.599f66a60bdf974e578e.woff2",
     "static/media/roboto-latin-300-normal.woff2": "/VS-mod-platform/static/media/roboto-latin-300-normal.db56943a88e4852343ae.woff2",
@@ -77,11 +77,11 @@
     "static/media/roboto-greek-ext-300-normal.woff": "/VS-mod-platform/static/media/roboto-greek-ext-300-normal.f9bcba068dd8c29805b0.woff",
     "index.html": "/VS-mod-platform/index.html",
     "main.25a3498c.css.map": "/VS-mod-platform/static/css/main.25a3498c.css.map",
-    "main.14a05a81.js.map": "/VS-mod-platform/static/js/main.14a05a81.js.map",
-    "453.a04ae9d0.chunk.js.map": "/VS-mod-platform/static/js/453.a04ae9d0.chunk.js.map"
+    "main.11f81ceb.js.map": "/VS-mod-platform/static/js/main.11f81ceb.js.map",
+    "453.5505c19b.chunk.js.map": "/VS-mod-platform/static/js/453.5505c19b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.25a3498c.css",
-    "static/js/main.14a05a81.js"
+    "static/js/main.11f81ceb.js"
   ]
 }

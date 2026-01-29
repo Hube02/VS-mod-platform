@@ -1,6 +1,6 @@
 {
-  "short_name": "VS-mod-platform",
-  "name": "Vintage Story Modpack Utility",
+  "short_name": "VS Mod Platform",
+  "name": "Vintage Story Mod Platform",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "/",
+  "start_url": "/VS-mod-platform",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
