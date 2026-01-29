@@ -46,7 +46,7 @@ export default function ModList({handleOpen}: {handleOpen: (isAdding: boolean) =
 
     useEffect(() => {
         if (page || searchQuery || isDescriptionSearch) {
-            fetchMods(page, searchQuery, isDescriptionSearch)
+            fetchMods(page, searchQuery.toLowerCase(), isDescriptionSearch)
         }
     }, [page, searchQuery, isDescriptionSearch]);
 
