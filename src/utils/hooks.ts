@@ -36,3 +36,48 @@ function checkSize(pixels: number, currentWidth: number) {
 export const useAppDispatch: () => AppDispatch = useDispatch
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
+
+export function usePWAInstall() {
+    const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
+    const [isInstallable, setIsInstallable] = useState(false);
+
+    useEffect(() => {
+        const handler = (e: Event) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setIsInstallable(true);
+        };
+
+        window.addEventListener("beforeinstallprompt", handler);
+
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handler);
+        };
+    }, []);
+
+    const promptInstall = async () => {
+        if (!deferredPrompt) return;
+
+        // @ts-ignore
+        deferredPrompt.prompt();
+
+        // @ts-ignore
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log("User response: ", outcome);
+
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+    };
+
+    return { isInstallable, promptInstall };
+}
+
+export const isIOS = () =>
+    /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+export function isInStandaloneMode(){
+// @ts-ignore
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone
+}
+
+
