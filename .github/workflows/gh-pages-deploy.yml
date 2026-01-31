@@ -15,7 +15,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Build and deploy
+      - name: Install and build
         run: |
           npm ci
-          npm run deploy -- -m "Deploying after push to master branch "
+          npm run build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: build
