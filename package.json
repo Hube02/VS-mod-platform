@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "vs-mod-platform",
+  "version": "0.7.0",
   "private": true,
   "homepage": "https://hube02.github.io/VS-mod-platform",
   "dependencies": {

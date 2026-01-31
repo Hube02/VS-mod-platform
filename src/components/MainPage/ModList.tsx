@@ -13,9 +13,10 @@ import {checkAllModsAndFetch, loadModpacks} from "../../store/storage";
 import {getAllMods, grabMods} from "../../store/api";
 import ModGrid from "./ModGrid";
 import ModSearch from "./ModSearch";
-import {useAppDispatch, useAppSelector} from "../../utils/hooks";
+import {isInStandaloneMode, isIOS, useAppDispatch, useAppSelector} from "../../utils/hooks";
 import {addModpack, setCurrentModpack, setModpacks, setCurrentMods, setMods} from "../../store/reducer";
 import {getCurrentModpack} from "../../store/selectors";
+import InstallButton from "../PWAInstallButton/PWAInstallButton";
 
 
 export default function ModList({handleOpen}: {handleOpen: (isAdding: boolean) => void}) {
@@ -46,7 +47,7 @@ export default function ModList({handleOpen}: {handleOpen: (isAdding: boolean) =
 
     useEffect(() => {
         if (page || searchQuery || isDescriptionSearch) {
-            fetchMods(page, searchQuery, isDescriptionSearch)
+            fetchMods(page, searchQuery.toLowerCase(), isDescriptionSearch)
         }
     }, [page, searchQuery, isDescriptionSearch]);
 
@@ -80,6 +81,7 @@ export default function ModList({handleOpen}: {handleOpen: (isAdding: boolean) =
                 <Typography variant="h4" fontWeight={700} gutterBottom>
                     Mod Browser
                 </Typography>
+                {isInStandaloneMode() ? null : isIOS() ? <span>To add as an app tap Share → Add to Home Screen</span> : <InstallButton/>}
                 <Button onClick={handleRefresh}>Refresh mods</Button>
             </Box>
             <ModSearch onChange={handleSearch}>

@@ -34,13 +34,13 @@ export default function ModBrowser() {
                     transition: {duration: 0.2}
                 }}/>
             </Button>
-            {isMobile ? (<Dialog sx={{width: '75vw', m: 'auto'}} slotProps={{paper: {sx: {p:2}}}} open={isSidebarOpen} onClose={() => setIsSidebarOpen(false)}>
+            {isMobile ? (<Dialog sx={{width: '75vw', m: 'auto'}} slotProps={{paper: {sx: {p:2}}}} open={!isSidebarOpen} onClose={() => setIsSidebarOpen(!isSidebarOpen)}>
                 <div style={{translate: '-16px', width: '100%', height: 'auto'}}>
                     <SelectCurrentModpack
-                        isOpen={isSidebarOpen}
+                        isOpen={!isSidebarOpen}
                     />
                     <CurrentModpack
-                        isOpen={isSidebarOpen}
+                        isOpen={!isSidebarOpen}
                     />
                 </div>
             </Dialog>) : (
